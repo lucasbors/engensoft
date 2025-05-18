@@ -25,4 +25,5 @@ Engensoft é um software de versionamento e edição de documentos técnicos com
 
 - [Lucas Borges](https://github.com/lucasbors)
 - [Felippe Dezzotti](https://github.com/FelippeDezzotti)
+- [Valdir Ferreira](https://github.com/RaelBioTec)
 - [Willian Oliveira](https://github.com/vv1ll14n)
