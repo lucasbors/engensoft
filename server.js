@@ -252,6 +252,29 @@ app.get('/documentos/busca', (req, res) => {
   );
 });
 
+app.delete('/documentos/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.get(`SELECT arquivo FROM documentos WHERE id = ?`, [id], (err, row) => {
+    if (err || !row) {
+      return res.status(404).json({ sucesso: false, mensagem: 'Documento não encontrado.' });
+    }
+
+    const caminho = path.join(__dirname, 'uploads', row.arquivo);
+    fs.unlink(caminho, (err) => {
+      if (err) console.warn('Erro ao apagar o arquivo:', err.message);
+    });
+
+    db.run(`DELETE FROM documentos WHERE id = ?`, [id], function (err) {
+      if (err) {
+        return res.status(500).json({ sucesso: false, mensagem: 'Erro ao excluir documento.' });
+      }
+
+      res.json({ sucesso: true, mensagem: 'Documento excluído com sucesso.' });
+    });
+  });
+});
+
 
 // Inicia servidor
 app.listen(PORT, () => {

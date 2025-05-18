@@ -122,12 +122,14 @@
       lista.innerHTML = "";
       docs.forEach(doc => {
         const li = document.createElement("li");
-        li.innerHTML = `
+li.setAttribute("data-id", doc.id); // importante!
+li.innerHTML = `
   ${doc.nome}
   <button class="visualizar" onclick="visualizarDocumento(${doc.id})">Visualizar</button>
   <button class="alterar" onclick="location.href='editar-documento.html?id=${doc.id}'">Alterar</button>
   <button class="apagar" onclick="excluirDocumento(${doc.id})">Apagar</button>
 `;
+
 
         lista.appendChild(li);
       });
@@ -158,18 +160,47 @@
       document.getElementById("modalVisualizar").style.display = "none";
     }
 
+    // async function excluirDocumento(id) {
+    //   const confirmar = confirm("Deseja realmente excluir este documento?");
+    //   if (!confirmar) return;
+
+    //   const resposta = await fetch(`/documentos/${id}`, {
+    //     method: "DELETE"
+    //   });
+
+    //   const resultado = await resposta.json();
+    //   alert(resultado.mensagem);
+    //   carregarDocumentos();
+    // }
+
     async function excluirDocumento(id) {
-      const confirmar = confirm("Deseja realmente excluir este documento?");
-      if (!confirmar) return;
+  const confirmar = confirm("Deseja realmente excluir este documento?");
+  if (!confirmar) return;
 
-      const resposta = await fetch(`/documentos/${id}`, {
-        method: "DELETE"
-      });
+  try {
+    const resposta = await fetch(`/documentos/${id}`, {
+      method: "DELETE"
+    });
 
-      const resultado = await resposta.json();
-      alert(resultado.mensagem);
-      carregarDocumentos();
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      // Remove visualmente da lista:
+      const li = document.querySelector(`li[data-id="${id}"]`);
+      if (li) li.remove();
+
+      alert("Documento excluído com sucesso!");
+      carregarDocumentos(); // força recarregar
+    } else {
+      alert("Erro: " + resultado.mensagem);
     }
+  } catch (erro) {
+    alert("Erro ao excluir o documento.");
+    console.error(erro);
+  }
+}
+
+
 
     document.addEventListener("DOMContentLoaded", () => {
       carregarDocumentos();
