@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Usuários - EngenSoft</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="form">
+      <h2>Usuários Cadastrados</h2>
+      <ul id="listaUsuarios"></ul>
+      <button onclick="window.location.href='dashboard.html'">Voltar</button>
+    </div>
+  </div>
+
+  <script>
+    async function carregarUsuarios() {
+      const resposta = await fetch("/usuarios");
+      const usuarios = await resposta.json();
+
+      const lista = document.getElementById("listaUsuarios");
+      lista.innerHTML = "";
+
+      usuarios.forEach((user) => {
+        const item = document.createElement("li");
+        item.textContent = `• ${user.usuario} (${user.tipo})`;
+
+        if (user.usuario !== "admin") {
+          const btn = document.createElement("button");
+          btn.textContent = "Excluir";
+          btn.style.marginLeft = "10px";
+          btn.onclick = () => excluirUsuario(user.usuario);
+
+          item.appendChild(btn);
+        }
+
+        lista.appendChild(item);
+      });
+    }
+
+    async function excluirUsuario(usuario) {
+      if (!confirm(`Tem certeza que deseja excluir o usuário "${usuario}"?`)) return;
+
+      const resposta = await fetch(`/usuarios/${usuario}`, {
+        method: "DELETE"
+      });
+
+      const dados = await resposta.json();
+      alert(dados.mensagem);
+      carregarUsuarios(); // recarrega a lista
+    }
+
+    carregarUsuarios();
+  </script>
+</body>

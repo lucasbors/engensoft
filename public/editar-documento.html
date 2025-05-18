@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Documento</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="central-container">
+    <div class="form" style="max-width: 400px;">
+      <h2>Editar Documento</h2>
+
+      <label>Nome *</label>
+      <input type="text" id="nome" />
+
+      <label>Data *</label>
+      <input type="date" id="data" />
+
+      <label>Observação (opcional)</label>
+      <textarea id="observacao" rows="3" style="width: 100%; border-radius: 10px; border: 1px solid #ccc; padding: 8px;"></textarea>
+
+      <label>Substituir Arquivo (opcional)</label>
+      <input type="file" id="arquivo" accept=".pdf,.doc,.docx,.xls" />
+
+      <p id="erro" class="erro-msg"></p>
+
+      <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button onclick="salvarAlteracoes()" class="btn-salvar" style="flex: 1;">Salvar</button>
+        <button onclick="window.location.href='gerenciar.html'" class="btn-fechar" style="flex: 1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get("id");
+
+    async function carregarDados() {
+      const resposta = await fetch(`/documentos/detalhes/${docId}`);
+      const doc = await resposta.json();
+
+      if (!doc || !doc.id) {
+        alert("Documento não encontrado.");
+        window.location.href = "gerenciar.html";
+        return;
+      }
+
+      document.getElementById("nome").value = doc.nome;
+      document.getElementById("data").value = doc.data;
+      document.getElementById("observacao").value = doc.observacao || "";
+    }
+
+    async function salvarAlteracoes() {
+      const nome = document.getElementById("nome").value.trim();
+      const data = document.getElementById("data").value.trim();
+      const observacao = document.getElementById("observacao").value.trim();
+      const arquivo = document.getElementById("arquivo").files[0];
+      const erro = document.getElementById("erro");
+
+      if (!nome || !data) {
+        erro.textContent = "Nome e data são obrigatórios.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("nome", nome);
+      formData.append("data", data);
+      formData.append("observacao", observacao);
+      if (arquivo) {
+        formData.append("arquivo", arquivo);
+      }
+
+      const resposta = await fetch(`/documentos/${docId}`, {
+        method: "PUT",
+        body: formData
+      });
+
+      const resultado = await resposta.json();
+      if (resultado.sucesso) {
+        alert("Documento atualizado com sucesso.");
+        window.location.href = "gerenciar.html";
+      } else {
+        erro.textContent = resultado.mensagem || "Erro ao atualizar.";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarDados);
+  </script>
+</body>
+</html>

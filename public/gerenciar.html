@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerenciar Documentos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="top-bar">
+    <button class="logoff-btn" onclick="window.location.href='dashboard.html'">Voltar</button>
+  </div>
+
+  <h1 class="titulo">Gerenciar arquivos</h1>
+
+  <div class="documentos-container">
+    <button class="btn-novo" onclick="abrirModal()">Novo</button>
+
+    <ul class="lista-documentos" id="listaDocumentos">
+      <!-- documentos serão inseridos aqui -->
+    </ul>
+  </div>
+
+  <!-- MODAL NOVO DOCUMENTO -->
+  <div class="modal" id="modalNovoDoc" style="display: none;">
+    <div class="modal-content">
+      <h2>Novo Documento</h2>
+
+      <label>Arquivo *<input type="file" id="arquivo" accept=".pdf,.doc,.docx,.xls" /></label>
+      <label>Nome *<input type="text" id="nomeDocumento" /></label>
+      <label>Data *<input type="date" id="dataDocumento" /></label>
+      <label>Observação (opcional)<textarea id="observacao" rows="3" style="width: 100%; border-radius: 10px; border: 1px solid #ccc; padding: 8px;"></textarea></label>
+
+      <div class="botoes-modal">
+        <button class="btn-salvar" onclick="salvarDocumento()">Salvar</button>
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+      </div>
+
+      <p id="erroMsg" class="erro-msg"></p>
+    </div>
+  </div>
+
+  <!-- MODAL VISUALIZAR DOCUMENTO -->
+  <div class="modal" id="modalVisualizar" style="display: none;">
+    <div class="modal-content">
+        <h2>Detalhes do Documento</h2>
+      
+        <p><strong>Nome:</strong> <span id="docNome"></span></p>
+        <p><strong>Data do documento:</strong> <span id="docData"></span></p>
+        <p><strong>Data de criação:</strong> <span id="docCriado"></span></p>
+        <p><strong>Última alteração:</strong> <span id="docAlterado"></span></p>
+        <p><strong>Observação:</strong> <span id="docObs"></span></p>
+        <p><strong>Arquivo salvo:</strong> <span id="docArquivo"></span></p>
+      
+        <div class="botoes-visualizar">
+          <a id="btnDownload" class="btn-baixar" href="#" download target="_blank">Baixar arquivo</a>
+          <button class="btn-fechar" onclick="fecharVisualizar()">Fechar</button>
+        </div>
+      </div>
+  </div>   
+
+  <script>
+    function abrirModal() {
+      document.getElementById("modalNovoDoc").style.display = "flex";
+    }
+
+    function fecharModal() {
+      document.getElementById("modalNovoDoc").style.display = "none";
+      document.getElementById("erroMsg").textContent = "";
+      document.getElementById("arquivo").value = "";
+      document.getElementById("nomeDocumento").value = "";
+      document.getElementById("dataDocumento").value = "";
+      document.getElementById("observacao").value = "";
+    }
+
+    async function salvarDocumento() {
+      const arquivo = document.getElementById("arquivo").files[0];
+      const nome = document.getElementById("nomeDocumento").value.trim();
+      const data = document.getElementById("dataDocumento").value.trim();
+      const erro = document.getElementById("erroMsg");
+      const usuario = localStorage.getItem("usuario");
+
+      if (!usuario) {
+        erro.textContent = "Usuário não autenticado.";
+        return;
+      }
+
+      if (!arquivo || !nome || !data) {
+        erro.textContent = "Todos os campos são obrigatórios.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("arquivo", arquivo);
+      formData.append("nome", nome);
+      formData.append("data", data);
+      formData.append("usuario", usuario);
+      const observacao = document.getElementById("observacao").value.trim();
+        formData.append("observacao", observacao);
+
+
+      const resposta = await fetch("/documentos", {
+        method: "POST",
+        body: formData
+      });
+
+      const resultado = await resposta.json();
+      if (resultado.sucesso) {
+        fecharModal();
+        carregarDocumentos();
+      } else {
+        erro.textContent = resultado.mensagem;
+      }
+    }
+
+    async function carregarDocumentos() {
+      const usuario = localStorage.getItem("usuario");
+      const resposta = await fetch(`/documentos/${usuario}`);
+      const docs = await resposta.json();
+      const lista = document.getElementById("listaDocumentos");
+
+      lista.innerHTML = "";
+      docs.forEach(doc => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+  ${doc.nome}
+  <button class="visualizar" onclick="visualizarDocumento(${doc.id})">Visualizar</button>
+  <button class="alterar" onclick="location.href='editar-documento.html?id=${doc.id}'">Alterar</button>
+  <button class="apagar" onclick="excluirDocumento(${doc.id})">Apagar</button>
+`;
+
+        lista.appendChild(li);
+      });
+    }
+
+    async function visualizarDocumento(id) {
+      const resposta = await fetch(`/documentos/detalhes/${id}`);
+      const doc = await resposta.json();
+
+      if (!doc || !doc.id) {
+        alert("Documento não encontrado.");
+        return;
+      }
+
+      document.getElementById("docNome").textContent = doc.nome;
+      document.getElementById("docData").textContent = doc.data;
+      document.getElementById("docArquivo").textContent = doc.arquivo;
+      document.getElementById("btnDownload").href = `/uploads/${doc.arquivo}`;
+      document.getElementById("docCriado").textContent = new Date(doc.criado_em).toLocaleString();
+    document.getElementById("docAlterado").textContent = doc.alterado_em ? new Date(doc.alterado_em).toLocaleString() : "Nenhuma alteração";
+    document.getElementById("docObs").textContent = doc.observacao ? doc.observacao : "—";
+
+
+      document.getElementById("modalVisualizar").style.display = "flex";
+    }
+
+    function fecharVisualizar() {
+      document.getElementById("modalVisualizar").style.display = "none";
+    }
+
+    async function excluirDocumento(id) {
+      const confirmar = confirm("Deseja realmente excluir este documento?");
+      if (!confirmar) return;
+
+      const resposta = await fetch(`/documentos/${id}`, {
+        method: "DELETE"
+      });
+
+      const resultado = await resposta.json();
+      alert(resultado.mensagem);
+      carregarDocumentos();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      carregarDocumentos();
+    });
+  </script>
+</body>
+</html>

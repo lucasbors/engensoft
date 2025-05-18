@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - EngenSoft</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="info">
+      <img src="./images/logo.png" alt="Logo EngenSoft" class="logo"/>
+      <p>
+        A EngenSoft é uma empresa especializada em soluções tecnológicas...
+      </p>
+    </div>
+
+    <div class="form">
+      <label for="usuario">Usuário</label>
+      <input type="text" id="usuario" />
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" />
+      <button onclick="fazerLogin()">Entrar</button>
+      <p id="erro" class="erro-msg"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - EngenSoft</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="top-bar">
+    <button class="logoff-btn" onclick="fazerLogoff()">Logoff</button>
+  </div>
+
+  <div class="dashboard">
+    <div class="botao" onclick="location.href='gerenciar.html'">
+      Gerenciar documentos
+    </div>
+    <div class="botao" onclick="location.href='buscar-documento.html'">
+      Buscar documento
+    </div>    
+    <div class="botao admin-only" onclick="location.href='criar-usuario.html'">
+      Criar novo usuário
+    </div>
+    <div class="botao admin-only" onclick="location.href='listar-usuarios.html'">
+      Listar usuários
+    </div>
+  </div>
+
+  <script>
+    function fazerLogoff() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    // Esconde botões de admin se for usuário comum
+    const tipo = localStorage.getItem("tipoUsuario");
+
+    if (tipo !== "admin") {
+      document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
+    }
+  </script>
+</body>
+</html>

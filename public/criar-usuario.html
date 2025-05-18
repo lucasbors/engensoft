@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Criar Usuário - EngenSoft</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="central-container">
+        <div class="form form-criar-usuario">
+          <h2 class="titulo-centralizado">Criar Novo Usuário</h2>
+    
+          <label for="novoUsuario">Usuário</label>
+          <input type="text" id="novoUsuario" />
+    
+          <label for="novaSenha">Senha</label>
+          <input type="password" id="novaSenha" />
+    
+          <button class="btn-criar" onclick="criarUsuario()">Criar</button>
+          <p id="mensagem" class="mensagem-status"></p>
+    
+          <button class="btn-voltar" onclick="window.location.href='dashboard.html'">Voltar</button>
+        </div>
+  </div>
+
+  <script>
+    async function criarUsuario() {
+      const usuario = document.getElementById("novoUsuario").value.trim();
+      const senha = document.getElementById("novaSenha").value.trim();
+      const mensagem = document.getElementById("mensagem");
+
+      const resposta = await fetch("/criar-usuario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, senha })
+      });
+
+      const dados = await resposta.json();
+
+      mensagem.textContent = dados.mensagem;
+      mensagem.style.color = dados.sucesso ? "green" : "red";
+
+      if (dados.sucesso) {
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1500);
+      }
+    }
+  </script>
+</body>
+</html>

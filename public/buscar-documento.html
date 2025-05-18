@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buscar Documento</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="central-container">
+    <div class="form" style="max-width: 400px; width: 100%;">
+      <h2>Buscar Documento</h2>
+      <input type="text" id="busca" placeholder="Digite parte do nome..." style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc;"/>
+      <ul id="resultado" style="margin-top: 20px;"></ul>
+      <button class="btn-fechar" onclick="window.location.href='dashboard.html'">Voltar</button>
+    </div>
+  </div>
+
+  <!-- MODAL VISUALIZAR DOCUMENTO -->
+<div class="modal" id="modalVisualizar" style="display: none;">
+    <div class="modal-content">
+      <h2>Detalhes do Documento</h2>
+  
+      <p><strong>Nome:</strong> <span id="docNome"></span></p>
+      <p><strong>Data do documento:</strong> <span id="docData"></span></p>
+      <p><strong>Data de criação:</strong> <span id="docCriado"></span></p>
+      <p><strong>Última alteração:</strong> <span id="docAlterado"></span></p>
+      <p><strong>Observação:</strong> <span id="docObs"></span></p>
+      <p><strong>Arquivo salvo:</strong> <span id="docArquivo"></span></p>
+  
+      <div class="botoes-visualizar">
+        <a id="btnDownload" class="btn-baixar" href="#" download target="_blank">Baixar arquivo</a>
+        <button class="btn-fechar" onclick="fecharVisualizar()">Fechar</button>
+      </div>
+    </div>
+  </div>
+  
+
+  <script>
+    const usuario = localStorage.getItem("usuario");
+    let todosDocumentos = [];
+  
+    async function carregarDocumentos() {
+      const resposta = await fetch(`/documentos/${usuario}`);
+      todosDocumentos = await resposta.json();
+    }
+
+    async function visualizarDocumento(id) {
+  const resposta = await fetch(`/documentos/detalhes/${id}`);
+  const doc = await resposta.json();
+
+  if (!doc || !doc.id) {
+    alert("Documento não encontrado.");
+    return;
+  }
+
+  document.getElementById("docNome").textContent = doc.nome;
+  document.getElementById("docData").textContent = doc.data;
+  document.getElementById("docCriado").textContent = new Date(doc.criado_em).toLocaleString();
+  document.getElementById("docAlterado").textContent = doc.alterado_em ? new Date(doc.alterado_em).toLocaleString() : "Nenhuma alteração";
+  document.getElementById("docObs").textContent = doc.observacao || "—";
+  document.getElementById("docArquivo").textContent = doc.arquivo;
+  document.getElementById("btnDownload").href = `/uploads/${doc.arquivo}`;
+  document.getElementById("modalVisualizar").style.display = "flex";
+}
+
+function fecharVisualizar() {
+  document.getElementById("modalVisualizar").style.display = "none";
+}
+
+  
+    document.getElementById("busca").addEventListener("input", (e) => {
+      const termo = e.target.value.toLowerCase().trim();
+      const resultado = document.getElementById("resultado");
+  
+      if (termo.length < 2) {
+        resultado.innerHTML = "";
+        return;
+      }
+  
+      const filtrados = todosDocumentos.filter(doc =>
+        doc.nome.toLowerCase().includes(termo)
+      );
+  
+      resultado.innerHTML = "";
+  
+      if (filtrados.length === 0) {
+        resultado.innerHTML = "<li>Nenhum documento encontrado.</li>";
+      } else {
+        filtrados.forEach(doc => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+  ${doc.nome}
+  <button class="visualizar" onclick="visualizarDocumento(${doc.id})">Visualizar</button>
+`;
+          resultado.appendChild(li);
+        });
+      }
+    });
+  
+    document.addEventListener("DOMContentLoaded", carregarDocumentos);
+  </script>
+  
+</body>
+</html>
