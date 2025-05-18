@@ -13,7 +13,7 @@ Engensoft é um software de versionamento e edição de documentos técnicos com
 
 **Front-end:** HTML, CSS
 
-**Back-end:** Node js SQlite
+**Back-end:** Node js, SQlite
 
 
 
