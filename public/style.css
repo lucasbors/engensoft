@@ -5,7 +5,10 @@ body {
     background: #fff;
     color: #333;
   }
-  
+  p{
+    text-align: justify;
+  }
+
   .login-container {
     display: flex;
     justify-content: space-between;
