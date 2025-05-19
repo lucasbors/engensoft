@@ -16,10 +16,35 @@ Engensoft é um software de versionamento e edição de documentos técnicos com
 **Back-end:** Node js, SQlite
 
 
-
-
-
 ![wireframe](https://private-user-images.githubusercontent.com/112718929/444926696-97e7aa31-49d7-42a5-9445-5d776ef89575.jpeg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDc2MDgwNjMsIm5iZiI6MTc0NzYwNzc2MywicGF0aCI6Ii8xMTI3MTg5MjkvNDQ0OTI2Njk2LTk3ZTdhYTMxLTQ5ZDctNDJhNS05NDQ1LTVkNzc2ZWY4OTU3NS5qcGVnP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDUxOCUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTA1MThUMjIzNjAzWiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9YmVmYTkwZjUxMThjMGI5ODMzM2U3NzhhOWU1N2NkZWRiMDM0NDI4YTIxZTAyODIxZmJjYWIxYzIyNDNkZTNhZCZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.TBE9e5OEa4IELRsqKPurEynlWafvGfv6DXSGEqUfL-M)
+
+
+
+## Rodando localmente
+
+#  Servidor Node.js Básico
+
+Este repositório contém um servidor HTTP básico feito com Node.js puro.
+
+
+### Como usar
+
+1. Clone o repositório:
+
+git clone https://github.com/lucasbors/engensoft.git
+ 
+2. Com o direitório do projeto inicie o servidor:
+
+node server.js
+
+3. No navegador:
+
+http://localhost:3000
+
+4. User padrao:
+Usuário: admin
+Senha: admin123
+
 
 ## Autores
 
